@@ -6,6 +6,7 @@ You will need to create two .env files in your repo: .env.test and .env.developm
 --- 
 
 /api endpoints 
+
 GET /api = Responds with 200 and an object detailing all the available endpoints of the api.
 Example: 
    {
@@ -23,6 +24,28 @@ Example:
           exampleResponse: { articles: [Array] }
         }
       }
+
+GET /api/topics = Responds with 200 and an array of topic objects.
+Example: 
+[
+  {
+    description: 'The man, the Mitch, the legend',
+    slug: 'mitch'
+  },
+  {
+    description: 'Not dogs',
+    slug: 'cats'
+  },
+  {
+    description: 'what books are made of',
+    slug: 'paper'
+  }
+];
+
+--- 
+
+Erros:
+- handle404s: Responds to all requests with a 'Route Not Found' for invalid input. Eg. GET /api/tpics
 
 
 

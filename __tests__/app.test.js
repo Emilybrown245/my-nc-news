@@ -23,3 +23,30 @@ describe("GET /api", () => {
       });
   });
 });
+
+describe("GET /api/topics", () => {
+  test("200: Responds with an array of topic objects", () => {
+    return request(app)
+      .get("/api/topics")
+      .expect(200)
+      .then(({ body }) => {
+        const { topics } = body;
+        expect(topics).toHaveLength(3)
+        topics.forEach((topic) => {
+          expect(topic).toMatchObject({
+            description: expect.any(String),
+            slug: expect.any(String)
+          })
+        })
+      });
+  });
+
+  test("404: Responds with a 'Route Not Found' for invalid input", () => {
+    return request(app)
+      .get("/api/tpics")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Route Not Found")
+      })
+    });
+});
