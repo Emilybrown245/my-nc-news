@@ -1,5 +1,5 @@
 const endpointsJson = require("../endpoints.json");
-const { readTopics, fetchArticleById, selectArticles} = require("../models/app.model");
+const { readTopics, fetchArticleById, selectArticles, checkArticleExist, selectCommentsByArticleId} = require("../models/app.model");
 
 exports.getApi = (req, res) => {
 res.status(200).send({ endpoints: endpointsJson });
@@ -20,8 +20,20 @@ exports.getArticleById = (req, res, next) => {
     .catch(next);
 }
 
-exports.getArticles = (req, res) => {
+exports.getArticles = (req, res, next) => {
     selectArticles().then((articles) => {
         res.status(200).send({articles});
-    });
+    })
+    .catch(next);
 }
+
+exports.getCommentsByArticleId = (req, res, next) => {
+    const { article_id } = req.params;
+    checkArticleExist(article_id).then(() => {
+        return selectCommentsByArticleId(article_id);
+    }).then((comments) => {
+            res.status(200).send({ comments })
+    })
+    .catch(next);
+}
+
