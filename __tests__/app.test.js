@@ -92,7 +92,6 @@ describe("GET /api/articles", () => {
      .expect(200)
      .then(({ body }) => {
       const { articles } = body;
-      ///console.log(articles)
       expect(articles).toHaveLength(13)
       articles.forEach((article) => {
         expect(article).toMatchObject({
@@ -108,7 +107,7 @@ describe("GET /api/articles", () => {
       })
     })
   })
- test("200: The articles should be sored by date in descending order", () => {
+ test("200: The articles should be sorted by date in descending order", () => {
   return request(app)
   .get("/api/articles")
   .expect(200)
@@ -127,4 +126,60 @@ describe("GET /api/articles", () => {
       expect(body.msg).toBe('Route Not Found');
     });
 });
+})
+describe("GET /api/articles/:article_id/comments ", () => {
+  test("200: Responds with an array of comments for a given article_id", () => {
+    return request(app)
+    .get("/api/articles/9/comments")
+    .expect(200)
+    .then(({ body }) => {
+      const { comments } = body;
+      expect(comments).toHaveLength(2);
+      comments.forEach((comment) => {
+        expect(comment).toMatchObject({
+          comment_id: expect.any(Number),
+          votes: expect.any(Number),
+          created_at: expect.any(String),
+          author: expect.any(String),
+          body: expect.any(String),
+          article_id: 9
+        })
+      })
+    })
+  })
+  test("200: Responds with comments sorted by created_at in descending order if there are multiple comments", () => {
+    return request(app)
+    .get("/api/articles/1/comments")
+    .expect(200)
+    .then(({ body }) => {
+    const { comments } = body;
+    expect(comments).toHaveLength(11)
+    const sortedArr = [...comments].sort((a, b) => b.created_at.localeCompare(a.created_at));
+    expect(comments).toEqual(sortedArr);
+    })
+  })
+  test("200: Responds with an empty array if the article exists but there are no comments", () => {
+    return request(app)
+    .get("/api/articles/2/comments")
+    .expect(200)
+    .then(({ body }) => {
+      expect(body.comments).toEqual([])
+    })
+  })
+  test("400: sends an appropriate status and error message when given an invalid id", () => {
+    return request(app)
+      .get('/api/articles/not-an-article-id/comments')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Bad Request');
+      });
+  });
+test("404: Responds with error message if article does not exist", () => {
+  return request(app)
+  .get("/api/articles/9000/comments")
+  .expect(404)
+  .then(({ body }) => {
+    expect(body.msg).toBe("Article Doesn't Exist")
+  })
+})
 })
