@@ -121,5 +121,22 @@
       }
     ]
   }
+},
+"DELETE /api/comments/:comments_id": {
+  "description": "deletes a comments by comment_id",
+  "queries": ["return_message=true", "<--- if set to true then return confirmation message"],
+  "parameters": ["comment_id", "<-- comment_id is 1 in this case"],
+  "comment": [{
+    "comment_id": 1,
+    "body": "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+    "article_id": 9,
+   "author": "butter_bridge",
+    "votes": 0,
+    "created_at": 1586179020000
+  }],
+  "exampleResponse": {
+   "204": "No Content",
+   "200": {"msg": "Comment deleted successfully"}
+  }
 }
 }
