@@ -1,5 +1,5 @@
 const endpointsJson = require("../endpoints.json");
-const { readTopics, fetchArticleById, selectArticles, checkArticleExist, selectCommentsByArticleId, addComment, checkUserExists} = require("../models/app.model");
+const { readTopics, fetchArticleById, selectArticles, checkArticleExist, selectCommentsByArticleId, addComment, checkUserExists, updateVotes} = require("../models/app.model");
 
 exports.getApi = (req, res) => {
 res.status(200).send({ endpoints: endpointsJson });
@@ -44,12 +44,28 @@ exports.postCommentToArticle = (req, res, next) => {
     if(!username || !body){
         return res.status(400).send({msg: "Bad request: missing username or body"});
     }
-    Promise.all([checkUserExists(username), checkArticleExist]).then(() => {
+    Promise.all([checkUserExists(username), checkArticleExist(article_id)]).then(() => {
         return addComment(article_id, username, body);
     }).then((comment) => {
         res.status(201).send({comment})
     })
     .catch(next)
+}
+
+exports.patchArticleVotes = (req, res, next) => {
+    const { article_id } = req.params;
+    const { inc_votes } = req.body;
+
+    Promise.all([checkArticleExist(article_id)]).then(() => {
+        return updateVotes(article_id, inc_votes);
+    })
+   .then((updatedArticle) => {
+        res.status(200).send({ article: updatedArticle })
+    })
+    .catch((err) => {
+        console.log(err)
+        next(err)
+    })
 }
 
 
