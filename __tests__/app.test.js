@@ -354,3 +354,39 @@ test("404: Responds with error message if article does not exist", () => {
   })
 })
 })
+describe("DELETE /api/comments/:comments_id", () => {
+  test("204: Should delete the comment with the given ID", () => {
+    return request(app)
+    .delete("/api/comments/1")
+    .expect(204)
+    .then(() => {
+      return db.query(`SELECT * FROM comments WHERE comment_id = $1`, [1]).then(({ rows }) => {
+        expect(rows.length).toBe(0)
+      })
+    })
+  })
+  test("200: Should return a message when the comment has been successfully deleted", () => {
+    return request(app)
+    .delete("/api/comments/2?return_message=true")
+    .expect(200)
+    .then(({ body }) => {
+      expect(body.msg).toBe("Comment successfully deleted")
+    })
+  })
+  test("400: Sends an appropriate status and error message when given an invalid comment_id", () => {
+    return request(app)
+      .delete('/api/comments/not-a-comment-id')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Bad Request');
+      });
+})
+  test("404: Should respond with appropriate error message if the comment does not exist", () => {
+    return request(app)
+    .delete('/api/comments/80500')
+    .expect(404)
+    .then(({ body }) => {
+      expect(body.msg).toBe("Comment Not Found")
+    })
+  })
+})
