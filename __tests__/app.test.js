@@ -248,3 +248,109 @@ describe("POST /api/articles/:article_id/comments", () => {
     })
   })
 })
+describe("PATCH /api/articles/:article_id", () => {
+  test("200: Should update article to inclued votes", () => {
+    const updatedVotes = {
+      inc_votes: 12
+    }
+    return request(app)
+    .patch("/api/articles/4")
+    .expect(200)
+    .send(updatedVotes)
+    .then(({ body }) => {
+      const { article } = body;
+      expect(article).toMatchObject({
+          article_id: 4,
+          title: expect.any(String),
+          topic: expect.any(String),
+          author: expect.any(String),
+          body: expect.any(String),
+          created_at: expect.any(String),
+          votes: 12,
+          article_img_url: expect.any(String),
+      })
+    })
+  })
+  test("200: Should increment an article's votes when value is already defined", () => {
+    const updatedVotes = {
+      inc_votes: 50
+    }
+    return request(app)
+    .patch("/api/articles/1")
+    .send(updatedVotes)
+    .expect(200)
+    .then(({ body }) => {
+      const { article } = body;
+      expect(article).toMatchObject({
+          article_id: 1,
+          title: expect.any(String),
+          topic: expect.any(String),
+          author: expect.any(String),
+          body: expect.any(String),
+          created_at: expect.any(String),
+          votes: 150,
+          article_img_url: expect.any(String),
+      })
+    })
+  })
+  test("200: Should decrement an article's votes when value is already defined", () => {
+    const updatedVotes = {
+      inc_votes: -50
+    }
+    return request(app)
+    .patch("/api/articles/1")
+    .send(updatedVotes)
+    .expect(200)
+    .then(({ body }) => {
+      const { article } = body;
+      expect(article).toMatchObject({
+          article_id: 1,
+          title: expect.any(String),
+          topic: expect.any(String),
+          author: expect.any(String),
+          body: expect.any(String),
+          created_at: expect.any(String),
+          votes: 50,
+          article_img_url: expect.any(String),
+      })
+    })
+  })
+  test("400: Should respond with error message if inc_votes is not given", () => {
+    const invalidVotes = {};
+    return request(app)
+    .patch("/api/articles/2")
+    .send(invalidVotes)
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.msg).toBe("Bad Request: inc_votes field is missing")
+    })
+  })
+  test("400: Should respond with error message if inc_votes is not given a number", () => {
+    const invalidVotes = {
+      inc_votes: "hi"
+    }
+    return request(app)
+    .patch("/api/articles/2")
+    .send(invalidVotes)
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.msg).toBe("Bad Request")
+    })
+  })
+  test("400: Sends an appropriate status and error message when given an invalid id", () => {
+    return request(app)
+      .patch('/api/articles/not-an-article-id')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Bad Request');
+      });
+})
+test("404: Responds with error message if article does not exist", () => {
+  return request(app)
+  .patch("/api/articles/2000")
+  .expect(404)
+  .then(({ body }) => {
+    expect(body.msg).toBe("Article Doesn't Exist")
+  })
+})
+})
