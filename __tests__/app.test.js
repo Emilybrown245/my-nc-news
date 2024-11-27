@@ -4,6 +4,7 @@ const seed = require("../db/seeds/seed");
 const db = require("../db/connection");
 const app = require("../app");
 const request = require("supertest");
+const jestSorted = require("jest-sorted");
 
 beforeEach(() => {
   return seed(testData);
@@ -107,7 +108,7 @@ describe("GET /api/articles", () => {
       })
     })
   })
- test("200: The articles should be sorted by date in descending order", () => {
+ test("200: The articles should be sorted by date in descending order by default", () => {
   return request(app)
   .get("/api/articles")
   .expect(200)
@@ -118,6 +119,130 @@ describe("GET /api/articles", () => {
     expect(articles).toEqual(sortedArr);
   })
  })
+ test("200: Responds with articles sorted by created_at in ascending order when specified", () => {
+  return request(app)
+  .get('/api/articles?order=asc')
+  .expect(200).then(({ body }) => {
+    const { articles } = body;
+    expect(articles).toHaveLength(13);
+    expect(articles).toBeSortedBy('created_at', {ascending: true});
+  })
+ })
+ test("200: Responds with articles sorted by created_at in descending order when specified", () => {
+  return request(app)
+  .get('/api/articles?order=desc')
+  .expect(200).then(({ body }) => {
+    const { articles } = body;
+    expect(articles).toHaveLength(13);
+    expect(articles).toBeSortedBy('created_at', {descending: true});
+  })
+ })
+ test("200: Responds with articles sorted by votes in ascending order when specified", () => {
+  return request(app)
+  .get('/api/articles?sort_by=votes&order=asc')
+  .expect(200).then(({ body }) => {
+    const { articles } = body;
+    expect(articles).toHaveLength(13);
+    expect(articles).toBeSortedBy('votes', {ascending: true});
+  })
+ })
+ test("200: Responds with articles sorted by votes in descending order when specified", () => {
+  return request(app)
+  .get('/api/articles?sort_by=votes&order=asc')
+  .expect(200).then(({ body }) => {
+    const { articles } = body;
+    expect(articles).toHaveLength(13);
+    expect(articles).toBeSortedBy('votes', {ascending: true});
+  })
+ })
+ test("200: Responds with articles sorted by author in ascending order when specified", () => {
+  return request(app)
+  .get('/api/articles?sort_by=author&order=asc')
+  .expect(200).then(({ body }) => {
+    const { articles } = body;
+    expect(articles).toHaveLength(13);
+    expect(articles).toBeSortedBy('author', {ascending: true});
+  })
+ })
+ test("200: Responds with articles sorted by author in descending order when specified", () => {
+  return request(app)
+  .get('/api/articles?sort_by=author&order=desc')
+  .expect(200).then(({ body }) => {
+    const { articles } = body;
+    expect(articles).toHaveLength(13);
+    expect(articles).toBeSortedBy('author', {descending: true});
+  })
+ })
+ test("200: Responds with articles sorted by title in ascending order when specified", () => {
+  return request(app)
+  .get('/api/articles?sort_by=title&order=asc')
+  .expect(200).then(({ body }) => {
+    const { articles } = body;
+    expect(articles).toHaveLength(13);
+    expect(articles).toBeSortedBy('title', {ascending: true});
+  })
+ })
+ test("200: Responds with articles sorted by title in descending order when specified", () => {
+  return request(app)
+  .get('/api/articles?sort_by=title&order=desc')
+  .expect(200).then(({ body }) => {
+    const { articles } = body;
+    expect(articles).toHaveLength(13);
+    expect(articles).toBeSortedBy('title', {descending: true});
+  })
+ })
+ test("200: Responds with articles sorted by article_id in ascending order when specified", () => {
+  return request(app)
+  .get('/api/articles?sort_by=article_id&order=asc')
+  .expect(200).then(({ body }) => {
+    const { articles } = body;
+    expect(articles).toHaveLength(13);
+    expect(articles).toBeSortedBy('article_id', {ascending: true});
+  })
+ })
+ test("200: Responds with articles sorted by article_id in descending order when specified", () => {
+  return request(app)
+  .get('/api/articles?sort_by=article_id&order=desc')
+  .expect(200).then(({ body }) => {
+    const { articles } = body;
+    expect(articles).toHaveLength(13);
+    expect(articles).toBeSortedBy('article_id', {descending: true});
+  })
+ })
+ test("200: Responds with articles sorted by comment_count in ascending order when specified", () => {
+  return request(app)
+  .get('/api/articles?sort_by=comment_count&order=asc')
+  .expect(200).then(({ body }) => {
+    const { articles } = body;
+    expect(articles).toHaveLength(13);
+    expect(articles).toBeSortedBy('comment_count', {ascending: true});
+  })
+ })
+ test("200: Responds with articles sorted by comment_count in descending order when specified", () => {
+  return request(app)
+  .get('/api/articles?sort_by=comment_count&order=desc')
+  .expect(200).then(({ body }) => {
+    const { articles } = body;
+    expect(articles).toHaveLength(13);
+    expect(articles).toBeSortedBy('comment_count', {descending: true});
+  })
+})
+ test("400: Sends an appropriate status and error message when given an invalid sort_by query", () => {
+  return request(app)
+    .get('/api/articles?sort_by=body')
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.msg).toBe('Invalid sort column');
+    });
+});
+test("400: Sends an appropriate status and error message when given an invalid order query", () => {
+  return request(app)
+    .get('/api/articles?order=hello')
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.msg).toBe('Invalid order query');
+    });
+});
  test("404: Sends an appropriate status and error message when given an non-existent route", () => {
   return request(app)
     .get('/api/artles')
