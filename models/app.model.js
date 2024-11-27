@@ -42,3 +42,17 @@ exports.selectCommentsByArticleId = (article_id) => {
     })
   }
 
+exports.addComment = (article_id, username, body) => {
+    return db.query(`INSERT INTO comments (article_id, author, body) VALUES ($1, $2, $3) RETURNING *`, [article_id, username, body]).then(({ rows }) => {
+      return rows[0];
+    })
+   }
+
+exports.checkUserExists = (username) => {
+  return db.query(`SELECT * FROM users WHERE username = $1`, [username]).then(({ rows }) => {
+    if(!rows.length){
+      return Promise.reject({status: 404, msg: "User Doesn't Exist"});
+    }
+    return rows;
+  })
+}
