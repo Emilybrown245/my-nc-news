@@ -491,7 +491,7 @@ describe("PATCH /api/articles/:article_id", () => {
     .send(invalidVotes)
     .expect(400)
     .then(({ body }) => {
-      expect(body.msg).toBe("Bad Request: inc_votes field is missing")
+      expect(body.msg).toBe("Bad Request")
     })
   })
   test("400: Should respond with error message if inc_votes is not given a number", () => {

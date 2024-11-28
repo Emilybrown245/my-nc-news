@@ -73,9 +73,6 @@ exports.checkUserExists = (username) => {
 }
 
 exports.updateVotes = (article_id, inc_votes) => {
-  if(!inc_votes){
-    return Promise.reject({status: 400, msg: "Bad Request: inc_votes field is missing"});
-  }
   return db.query(`UPDATE articles SET votes = votes + $2 WHERE article_id = $1 RETURNING *`, [article_id, inc_votes]).then(({ rows }) => {
     return rows[0];
   })
