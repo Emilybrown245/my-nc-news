@@ -23,17 +23,25 @@
   "GET /api/articles": {
     "description": "gets an array of articles, served by specific order of columns if specified and responds with the body property not included and the comment_count property added",
     "queries": {"sort_by": {
+      "description": "sorts articles by the most recent date",
       "default": "created_at",
       "example": "created_at",
       "valid_values": ["created_at", "votes", "author", "title", "article_id", "comment_count"]
     },
     "order": {
+      "description": "sorts articles by the most recent date",
       "default": "desc",
       "example": "desc",
       "valid_values": ["asc", "desc"]
+    },
+    "topic":{
+      "description": "Filters articles by the specified topic.",
+      "example": "mitch",
+      "valid_values": ["mitch", "cats", "paper"]
     }
   },
-    "exampleResponse": {
+  "exampleRequest": "/api/articles?sort_by=created_at&order=desc&topic=mitch",
+  "exampleResponse for queries sort_by and order and topic": {
      "articles": [
       {
         "article_id": 3,

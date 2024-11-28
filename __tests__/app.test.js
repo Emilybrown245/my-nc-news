@@ -227,17 +227,61 @@ describe("GET /api/articles", () => {
     expect(articles).toBeSortedBy('comment_count', {descending: true});
   })
 })
+test("200: Responds with articles filtered by the topic query when specified", () => {
+  return request(app)
+  .get('/api/articles?topic=mitch')
+  .expect(200).then(({ body }) => {
+    const { articles } = body;
+    expect(articles).toHaveLength(12);
+    articles.forEach((articles) => {
+      expect(articles.topic).toBe('mitch');
+    })
+  })
+})
+test("200: Responds with an empty array when filtering by a topic with no articles", () => {
+  return request(app)
+  .get('/api/articles?topic=paper')
+  .expect(200).then(({ body }) => {
+    const { articles } = body;
+    expect(articles).toHaveLength(0);
+    expect(body.articles).toEqual([])
+  })
+})
  test("400: Sends an appropriate status and error message when given an invalid sort_by query", () => {
   return request(app)
     .get('/api/articles?sort_by=body')
     .expect(400)
     .then(({ body }) => {
-      expect(body.msg).toBe('Invalid sort column');
+      expect(body.msg).toBe('Invalid sort query');
     });
 });
 test("400: Sends an appropriate status and error message when given an invalid order query", () => {
   return request(app)
     .get('/api/articles?order=hello')
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.msg).toBe('Invalid order query');
+    });
+});
+test("400: Sends an appropriate status and error message when given an invalid topic query", () => {
+  return request(app)
+    .get('/api/articles?topic=hi')
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.msg).toBe('Invalid topic query');
+    });
+});
+test("400: Should respond with appropriate error messages in order when given multiple invalid queries", () => {
+  return request(app)
+    .get('/api/articles?sort_by=body&order=hello&topic=hi')
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.msg).toBe('Invalid sort query');
+    });
+});
+test("400: Should respond with appropriate error messages in order when given multiple invalid queries", () => {
+  return request(app)
+    .get('/api/articles?sort_by=created_at&order=hello&topic=hi')
     .expect(400)
     .then(({ body }) => {
       expect(body.msg).toBe('Invalid order query');
@@ -333,14 +377,14 @@ describe("POST /api/articles/:article_id/comments", () => {
   })
   test("400: Sends appropriate status and error message when no username and/or body is given", () => {
     const invalidComment = {
-      username: "user123"
+      username: "rogersop"
     }
     return request(app)
-    .post("/api/articles/:article_id/comments")
+    .post("/api/articles/1/comments")
     .expect(400)
     .send(invalidComment)
     .then(({ body }) => {
-      expect(body.msg).toBe("Bad request: missing username or body");
+      expect(body.msg).toBe("Bad Request");
     })
   })
   test("400: Sends an appropriate status and error message when given an invalid id", () => {

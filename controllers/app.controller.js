@@ -21,8 +21,8 @@ exports.getArticleById = (req, res, next) => {
 }
 
 exports.getArticles = (req, res, next) => {
-    const {sort_by, order} = req.query;
-    selectArticles(sort_by, order).then((articles) => {
+    const {sort_by, order, topic} = req.query;
+    selectArticles(sort_by, order, topic).then((articles) => {
         res.status(200).send({articles});
     })
     .catch(next);
@@ -42,9 +42,6 @@ exports.postCommentToArticle = (req, res, next) => {
     const { article_id } = req.params;
     const { username, body } = req.body;
     
-    if(!username || !body){
-        return res.status(400).send({msg: "Bad request: missing username or body"});
-    }
     Promise.all([checkUserExists(username), fetchArticleById(article_id)]).then(() => {
         return addComment(article_id, username, body);
     }).then((comment) => {
