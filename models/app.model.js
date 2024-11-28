@@ -17,17 +17,34 @@ exports.readTopics = () => {
   })
 }
 
-exports.selectArticles = (sort_by = 'created_at', order = 'desc') => {
+exports.selectArticles = (sort_by = 'created_at', order = 'desc', topic) => {
   const validSortByColumns = ['created_at', 'votes', 'author', 'title', 'article_id', 'comment_count'];
+  const validTopics = ['mitch', 'cats', 'paper'];
+
   if(!validSortByColumns.includes(sort_by)){
-    return Promise.reject({status: 400, msg: "Invalid sort column"})
+    return Promise.reject({status: 400, msg: "Invalid sort query"})
   }
 
   if(order !== 'asc' && order !== 'desc'){
     return Promise.reject({status: 400, msg: "Invalid order query"});
   }
-  return db.query(`SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.article_id)::int AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id GROUP BY articles.article_id ORDER BY ${sort_by} ${order}`).then(({rows}) => {
-    return rows;
+
+  if(topic && !validTopics.includes(topic)){
+    return Promise.reject({status: 400, msg: "Invalid topic query"})
+  }
+
+  let queryString = `SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.article_id)::int AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id`
+  const queryParams = [];
+
+    if(validTopics.includes(topic)){
+      queryString += ` WHERE articles.topic = $1`;
+      queryParams.push(topic);
+    }
+    
+    queryString += ` GROUP BY articles.article_id ORDER BY ${sort_by} ${order}`;
+
+    return db.query(queryString, queryParams).then(({rows}) => {
+      return rows;
   })
 }
 
@@ -77,6 +94,5 @@ exports.selectUsers = () => {
   return db.query(`SELECT * FROM users;`).then(({ rows }) => {
     return rows;
   })
-
 }
 
