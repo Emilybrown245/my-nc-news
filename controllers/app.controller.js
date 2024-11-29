@@ -1,5 +1,5 @@
 const endpointsJson = require("../endpoints.json");
-const { readTopics, fetchArticleById, selectArticles, selectCommentsByArticleId, addComment, checkUserExists, updateVotes, selectCommentAndDelete, selectUsers} = require("../models/app.model");
+const { readTopics, fetchArticleById, selectArticles, selectCommentsByArticleId, addComment, checkUserExists, updateVotes, selectCommentAndDelete, selectUsers, fetchUserByUsername} = require("../models/app.model");
 
 exports.getApi = (req, res) => {
 res.status(200).send({ endpoints: endpointsJson });
@@ -82,4 +82,15 @@ exports.getUsers = (req, res, next) => {
         res.status(200).send({users});
     })
     .catch(next);
+}
+
+exports.getUserByUsername = (req, res, next) => {
+    const { username } = req.params;
+    checkUserExists(username).then((user) => {
+        res.status(200).send({user});
+    })
+    .catch((err) => {
+        console.log(err)
+        next(err)
+    })
 }

@@ -622,3 +622,26 @@ describe("GET /api/users", () => {
       })
     });
 })
+describe("GET /api/users/:username", () => {
+  test("200: Responds with a user when given username", () => {
+    return request(app)
+    .get('/api/users/rogersop')
+    .expect(200)
+    .then(({ body }) => {
+      const { user } = body;
+      expect(user).toMatchObject([{
+          username: 'rogersop',
+          avatar_url: expect.any(String),
+          name: expect.any(String)
+      }])
+    })
+  })
+  test("404: Should respond with error message when the username doesn't exist in the users table", () => {
+    return request(app)
+    .get("/api/users/user123")
+    .expect(404)
+    .then(({ body }) => {
+      expect(body.msg).toBe("User Doesn't Exist")
+    })
+  })
+})
