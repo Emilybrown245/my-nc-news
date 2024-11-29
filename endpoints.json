@@ -38,6 +38,12 @@
       "description": "Filters articles by the specified topic.",
       "example": "mitch",
       "valid_values": ["mitch", "cats", "paper"]
+    },
+    "comment_count":{
+      "description": "Gets the comment count by the article_id if set to true",
+      "exampleRequest": "/api/articles/1?comment_count=true",
+      "status": 200,
+      "responseBodyMessage": 11
     }
   },
   "exampleRequest": "/api/articles?sort_by=created_at&order=desc&topic=mitch",
@@ -73,8 +79,10 @@
         "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
         "comment_count": 0
       }
+      
       ]
     },
+
   "GET /api/articles/:articles_id": {
     "description": "serves an article by it's ID",
     "queries": [],

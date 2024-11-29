@@ -69,6 +69,22 @@ describe("GET /api/articles/:article_id", () => {
       })
     })
   })
+  test("200: Responds with comment count for articles with article id", () => {
+    return request(app)
+    .get('/api/articles/1?comment_count=true')
+    .expect(200)
+    .then((response) => {
+        expect(response.body.comment_count).toBe(11);
+    });
+  });
+  test("400: Sends an appropriate status and error message when given an comment query", () => {
+    return request(app)
+      .get('/api/articles/3/?comment_count=hi')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Invalid comment count query');
+      });
+  });
   test("404: Responds with 'Article Doesn't Exist' for article id that is valid but does not exist", () => {
     return request(app)
     .get("/api/articles/2000")
