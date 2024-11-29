@@ -724,3 +724,44 @@ test("404: Should respond with appropriate error message if the comment does not
   })
 })
 })
+describe("POST /api/articles", () => {
+  test("201: Responds with a new article added to the database ", () => {
+    const newArticle = {
+      title: "Another article about Tony",
+      topic: "mitch",
+      author: "butter_bridge",
+      body: "There will never be enough articles about Tony!",
+    }
+    return request(app)
+    .post("/api/articles")
+    .send(newArticle)
+    .expect(201)
+    .then(({ body }) => {
+      const { article } = body;
+      expect(article).toMatchObject({
+        article_id: expect.any(Number),
+        title: "Another article about Tony",
+        topic: "mitch",
+        author: "butter_bridge",
+        votes: 0,
+        comment_count: 0,
+        body: "There will never be enough articles about Tony!",
+        created_at: expect.any(String),
+        article_img_url: 'https://example.com/default.jpg'
+      })
+    })
+  })
+  test("400: Responds with appropriate error message if the request body is missing properties required", () => {
+    const newArticle = {
+      title: "Another article about Tony",
+      author: "butter_bridge"
+    }
+    return request(app)
+    .post('/api/articles')
+    .send(newArticle)
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.msg).toBe("Bad Request")
+    })
+  })
+})

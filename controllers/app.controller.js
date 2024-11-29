@@ -1,5 +1,5 @@
 const endpointsJson = require("../endpoints.json");
-const { readTopics, fetchArticleById, selectArticles, selectCommentsByArticleId, addComment, checkUserExists, updateVotes, selectCommentAndDelete, selectUsers, updateCommentVotes} = require("../models/app.model");
+const { readTopics, fetchArticleById, selectArticles, selectCommentsByArticleId, addComment, checkUserExists, updateVotes, selectCommentAndDelete, selectUsers, updateCommentVotes, addArticle} = require("../models/app.model");
 
 exports.getApi = (req, res) => {
 res.status(200).send({ endpoints: endpointsJson });
@@ -98,8 +98,15 @@ exports.patchCommentsVotes = (req, res, next) => {
     updateCommentVotes(comment_id, inc_vote).then((updatedComment) => {
         res.status(200).send({comment: updatedComment})
     })
-    .catch((err) => {
-        console.log(err)
-        next(err)
-    })
+    .catch(next);
+}
+
+exports.postArticle = (req, res, next) => {
+    const { author, title, body, topic, article_img_url  } = req.body;
+    const newArticle = { author, title, body, topic, article_img_url };
+
+   addArticle(newArticle).then((article) => {
+    res.status(201).send({ article })
+   })
+    .catch(next);
 }
