@@ -223,5 +223,23 @@
     }
   }
 }
+  },
+  "PATCH /api/comments/:comment_id": {
+    "description": "updates a comment's votes and responds with the updated comment",
+    "queries": [],
+    "parameters": ["comment_id", "<-- comment_id is 1 in this case"],
+    "exampleRequest": {
+      "inc_votes": 1
+    },
+    "exampleResponse": {
+      "comment": {
+        "comment_id": 1,
+        "body": "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+        "votes": 17,
+        "author": "butter_bridge",
+        "article_id": 9,
+        "created_at": "2020-04-06T13:17:00.000Z"
+      }
+    }
   }
 }

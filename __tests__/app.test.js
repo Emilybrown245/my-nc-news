@@ -645,3 +645,82 @@ describe("GET /api/users/:username", () => {
     })
   })
 })
+describe("PATCH /api/comments/:comments_id", () => {
+  test("200: Respond with the votes property incremented for a comment given it's comment_id", () => {
+    const newVote = {
+      inc_vote: 1
+    }
+    return request(app)
+    .patch('/api/comments/1')
+    .send(newVote)
+    .expect(200)
+    .then(({ body }) => {
+      const { comment } = body;
+      expect(comment).toMatchObject({
+        comment_id: 1,
+        body: expect.any(String),
+        votes: 17,
+        author: expect.any(String),
+        article_id: expect.any(Number),
+        created_at: expect.any(String),
+      })
+    })
+  })
+  test("200: Respond with the votes property decremented for a comment given it's comment_id", () => {
+    const newVote = {
+      inc_vote: -3
+    }
+    return request(app)
+    .patch('/api/comments/1')
+    .send(newVote)
+    .expect(200)
+    .then(({ body }) => {
+      const { comment } = body;
+      expect(comment).toMatchObject({
+        comment_id: 1,
+        body: expect.any(String),
+        votes: 13,
+        author: expect.any(String),
+        article_id: expect.any(Number),
+        created_at: expect.any(String),
+      })
+    })
+  })
+  test("400: Sends an appropriate status and error message when given an invalid comment_id", () => {
+    return request(app)
+      .patch('/api/comments/bvhggd')
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Bad Request');
+      });
+})
+test("400: Should respond with error message if inc_votes is not given", () => {
+  return request(app)
+  .patch("/api/comments/2")
+  .send({})
+  .expect(400)
+  .then(({ body }) => {
+    expect(body.msg).toBe("Bad Request")
+  })
+})
+test("400: Should respond with error message if inc_votes is not given a number", () => {
+  const invalidVotes = {
+    inc_votes: "hi"
+  }
+  return request(app)
+  .patch("/api/comments/4")
+  .send(invalidVotes)
+  .expect(400)
+  .then(({ body }) => {
+    expect(body.msg).toBe("Bad Request")
+  })
+})
+test("404: Should respond with appropriate error message if the comment does not exist", () => {
+  return request(app)
+  .patch('/api/comments/80500')
+  .expect(404)
+  .then(({ body }) => {
+    expect(body.msg).toBe("Comment Not Found")
+  })
+})
+})
