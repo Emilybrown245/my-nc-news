@@ -1,5 +1,6 @@
 const db = require("../db/connection");
 
+
 exports.readTopics = () => {
     return db.query(`SELECT * FROM topics;`).then(({ rows }) => {
       return rows;
@@ -99,5 +100,17 @@ exports.updateCommentVotes = (comment_id, inc_vote) => {
       return Promise.reject({status: 404, msg: "Comment Not Found"});
     }
     return rows[0];
+  })
+}
+
+exports.addArticle = (newArticle) => {
+  const { author, title, body, topic, article_img_url } = newArticle;
+  const imgUrl = article_img_url || 'https://example.com/default.jpg';
+  return db.query(`INSERT INTO articles (author, title, body, topic, article_img_url) VALUES ($1, $2, $3, $4, $5) RETURNING article_id, author, title, body, topic, article_img_url, votes, created_at, (SELECT COUNT(*) FROM comments WHERE article_id = articles.article_id) AS comment_count;`, [author, title, body, topic, imgUrl]).then(({ rows }) => {
+    const article = rows[0];
+    return {
+      ...article,
+      comment_count: Number(article.comment_count)
+    };
   })
 }
