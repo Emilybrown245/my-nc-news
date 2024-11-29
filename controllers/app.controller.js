@@ -1,5 +1,5 @@
 const endpointsJson = require("../endpoints.json");
-const { readTopics, fetchArticleById, selectArticles, selectCommentsByArticleId, addComment, checkUserExists, updateVotes, selectCommentAndDelete, selectUsers, fetchUserByUsername} = require("../models/app.model");
+const { readTopics, fetchArticleById, selectArticles, selectCommentsByArticleId, addComment, checkUserExists, updateVotes, selectCommentAndDelete, selectUsers, updateCommentVotes} = require("../models/app.model");
 
 exports.getApi = (req, res) => {
 res.status(200).send({ endpoints: endpointsJson });
@@ -88,6 +88,15 @@ exports.getUserByUsername = (req, res, next) => {
     const { username } = req.params;
     checkUserExists(username).then((user) => {
         res.status(200).send({user});
+    })
+    .catch(next);
+}
+
+exports.patchCommentsVotes = (req, res, next) => {
+    const { comment_id } = req.params;
+    const { inc_vote } = req.body;
+    updateCommentVotes(comment_id, inc_vote).then((updatedComment) => {
+        res.status(200).send({comment: updatedComment})
     })
     .catch((err) => {
         console.log(err)
