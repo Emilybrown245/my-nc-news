@@ -1,5 +1,5 @@
 const endpointsJson = require("../endpoints.json");
-const { readTopics, fetchArticleById, selectArticles, selectCommentsByArticleId, addComment, checkUserExists, updateVotes, selectCommentAndDelete, selectUsers} = require("../models/app.model");
+const { readTopics, fetchArticleById, selectArticles, selectCommentsByArticleId, addComment, checkUserExists, updateVotes, selectCommentAndDelete, selectUsers, addCommentCount} = require("../models/app.model");
 
 exports.getApi = (req, res) => {
 res.status(200).send({ endpoints: endpointsJson });
@@ -14,8 +14,21 @@ exports.getTopics = (req, res, next) =>{
 
 exports.getArticleById = (req, res, next) => {
     const { article_id } = req.params;
-    fetchArticleById(article_id).then((article) => {
-        res.status(200).send({article});
+    const { comment_count } = req.query;
+
+    if(comment_count && comment_count !== 'true'){
+        return next({ status: 400, msg: "Invalid comment count query" });
+      }
+
+    const promises = [fetchArticleById(article_id)];
+    
+    if(comment_count === 'true'){
+        promises.push(addCommentCount(article_id));
+      } 
+
+     Promise.all(promises).then(([article, comment_count]) => {
+
+         res.status(200).send({ article, comment_count});
     })
     .catch(next);
 }

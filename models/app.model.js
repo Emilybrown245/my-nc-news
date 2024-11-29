@@ -33,8 +33,8 @@ exports.selectArticles = (sort_by = 'created_at', order = 'desc', topic) => {
     return Promise.reject({status: 400, msg: "Invalid topic query"})
   }
 
-  let queryString = `SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.article_id)::int AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id`
   const queryParams = [];
+  let queryString = `SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.article_id)::int AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id`
 
     if(validTopics.includes(topic)){
       queryString += ` WHERE articles.topic = $1`;
@@ -93,3 +93,8 @@ exports.selectUsers = () => {
   })
 }
 
+exports.addCommentCount = (article_id) => {
+  return db.query(`SELECT COUNT(comments.article_id)::int AS comment_count FROM comments WHERE comments.article_id = $1`, [article_id]).then(({ rows }) => {
+    return rows[0].comment_count;
+  })
+}
