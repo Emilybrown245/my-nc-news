@@ -1,22 +1,20 @@
 const express = require("express");
-const { getApi, getTopics, getArticleById, getArticles, getCommentsByArticleId, postCommentToArticle, patchArticleVotes, deleteCommentById, getUsers} = require("./controllers/app.controller");
+const { getApi, getTopics, getUsers} = require("./controllers/app.controller");
 const { handle404s, handlePsqlErrors, handleCustomErrors } = require("./errors");
+const articlesRouter = require("./routes/articlesRouter");
+const commentsRouter = require("./routes/commentsRouter");
 
 const app = express()
 
 app.use(express.json())
 
+app.use('/api/articles', articlesRouter);
+app.use('/api', commentsRouter);
+
 //Get requests
 app.get('/api', getApi);
 app.get('/api/topics', getTopics);
-app.get('/api/articles/:article_id', getArticleById);
-app.get('/api/articles', getArticles);
-app.get('/api/articles/:article_id/comments', getCommentsByArticleId);
-app.post('/api/articles/:article_id/comments', postCommentToArticle);
-app.patch('/api/articles/:article_id', patchArticleVotes);
-app.delete('/api/comments/:comment_id', deleteCommentById);
 app.get('/api/users', getUsers);
-
 
 //Errors
 app.all("*", handle404s);
