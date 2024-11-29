@@ -1,6 +1,20 @@
 {
   "GET /api": {
-    "description": "serves up a json representation of all the available endpoints of the api"
+    "description": "serves up a json representation of all the available endpoints of the api",
+    "exampleResponse": {
+      "endpoints": [
+        { "method": "GET", "path": "/api" },
+        { "method": "GET", "path": "/api/topics" },
+        { "method": "GET", "path": "/api/articles" },
+        { "method": "GET", "path": "/api/articles/:article_id" },
+        { "method": "GET", "path": "/api/articles/:article_id/comments" },
+        { "method": "POST", "path": "/api/articles/:article_id/comments" },
+        { "method": "PATCH", "path": "/api/articles/:article_id" },
+        { "method": "DELETE", "path": "/api/comments/:comment_id" },
+        { "method": "GET", "path": "/api/users" },
+        { "method": "GET", "path": "/api/users/:username" }
+      ]
+    }
   },
   "GET /api/topics": {
     "description": "serves an array of all topics",
@@ -22,7 +36,8 @@
   },
   "GET /api/articles": {
     "description": "gets an array of articles, served by specific order of columns if specified and responds with the body property not included and the comment_count property added",
-    "queries": {"sort_by": {
+    "queries": {
+      "sort_by": {
       "description": "sorts articles by the most recent date",
       "default": "created_at",
       "example": "created_at",
@@ -38,12 +53,6 @@
       "description": "Filters articles by the specified topic.",
       "example": "mitch",
       "valid_values": ["mitch", "cats", "paper"]
-    },
-    "comment_count":{
-      "description": "Gets the comment count by the article_id if set to true",
-      "exampleRequest": "/api/articles/1?comment_count=true",
-      "status": 200,
-      "responseBodyMessage": 11
     }
   },
   "exampleRequest": "/api/articles?sort_by=created_at&order=desc&topic=mitch",
@@ -84,7 +93,7 @@
     },
 
   "GET /api/articles/:articles_id": {
-    "description": "serves an article by it's ID",
+    "description": "serves an article when given it's article ID",
     "queries": [],
     "exampleResponse": {
       "articles": [
@@ -103,7 +112,7 @@
     }
   },
   "GET /api/articles/:articles_id/comments": {
-    "description": "serves an array of comments for the given article_id sorted by the most recent first",
+    "description": "responds with an array of comments for the given article_id, sorted by the most recent first",
     "parameters": ["article_id", "<-- article_id is 1 in this case"],
     "queries": [],
     "exampleResponse": {
@@ -121,7 +130,7 @@
 "POST /api/articles/:articles_id/comments": {
   "description": "Adds a comment to an article, when given the article_id",
   "queries": [],
-  "comment": {
+  "exampleComment": {
     "username": "rogersop",
     "body": "I find this existence challenging"
   },
@@ -130,7 +139,7 @@
       "comment_id": 19,
       "body": "I find this existence challenging",
       "article_id": 2,
-     "author": "rogersop",
+      "author": "rogersop",
       "votes": 0,
       "created_at": "2024-11-27T10:21:08.868Z"
     }]
@@ -140,11 +149,12 @@
   "description": "updates an articles votes value",
   "queries": [],
   "parameters": ["article_id", "<-- article_id is 1 in this case"],
-  "updatedVote": {
+
+  "exampleUpdatedVote": {
    "inc_vote": 50
   },
   "exampleResponse": {
-    "articles": [
+    "article": [
       {
         "article_id": 1,
         "title": "Living in the shadow of a great man",
@@ -167,7 +177,7 @@
     "comment_id": 1,
     "body": "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
     "article_id": 9,
-   "author": "butter_bridge",
+    "author": "butter_bridge",
     "votes": 0,
     "created_at": 1586179020000
   }],
@@ -177,10 +187,10 @@
   }
 },
 "GET /api/users": {
-  "description": "serves an array of all users",
+  "description": "responds with an array of all users",
   "queries": [],
   "exampleResponse": {
-    "users": [  {
+    "users": [{
       "username": "butter_bridge",
       "name": "jonny",
       "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
@@ -201,5 +211,17 @@
       "avatar_url": "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png"
     }]
   }
+},
+"GET /api/users/:username": {
+  "description": "responds with a user object when given a username.",
+  "exampleRequest": "/api/users/rogersop",
+  "exampleResponse": {
+    "user": {
+      "username": "rogersop",
+      "avatar_url": "http://example.com/avatar.jpg",
+      "name": "Roger"
+    }
+  }
 }
-  }}
+  }
+}
