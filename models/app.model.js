@@ -20,8 +20,7 @@ exports.readTopics = () => {
 
 exports.selectArticles = (sort_by = 'created_at', order = 'desc', topic) => {
   const validSortByColumns = ['created_at', 'votes', 'author', 'title', 'article_id', 'comment_count'];
-  const validTopics = ['mitch', 'cats', 'paper'];
-
+  
   if(!validSortByColumns.includes(sort_by)){
     return Promise.reject({status: 400, msg: "Invalid sort query"})
   }
@@ -30,6 +29,12 @@ exports.selectArticles = (sort_by = 'created_at', order = 'desc', topic) => {
     return Promise.reject({status: 400, msg: "Invalid order query"});
   }
 
+  const validTopicsQuery = `SELECT slug FROM topics`;
+  return db.query(validTopicsQuery)
+    .then(({ rows }) => {
+      const validTopics = rows.map(row => row.slug);
+   
+
   if(topic && !validTopics.includes(topic)){
     return Promise.reject({status: 400, msg: "Invalid topic query"})
   }
@@ -37,16 +42,18 @@ exports.selectArticles = (sort_by = 'created_at', order = 'desc', topic) => {
   const queryParams = [];
   let queryString = `SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.article_id)::int AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id`
 
-    if(validTopics.includes(topic)){
+    if(topic && validTopics.includes(topic)){
       queryString += ` WHERE articles.topic = $1`;
       queryParams.push(topic);
     }
     
     queryString += ` GROUP BY articles.article_id ORDER BY ${sort_by} ${order}`;
 
-    return db.query(queryString, queryParams).then(({rows}) => {
-      return rows;
-  })
+    return db.query(queryString, queryParams)
+        .then(({ rows }) => {
+          return rows; // Return the fetched rows
+        });
+})
 }
 
 exports.selectCommentsByArticleId = (article_id) => {
