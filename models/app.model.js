@@ -30,19 +30,19 @@ exports.selectArticles = (sort_by = 'created_at', order = 'desc', topic) => {
   }
 
   const validTopicsQuery = `SELECT slug FROM topics`;
+
   return db.query(validTopicsQuery)
     .then(({ rows }) => {
       const validTopics = rows.map(row => row.slug);
    
-
-  if(topic && !validTopics.includes(topic)){
+      if(topic && !validTopics.includes(topic)){
     return Promise.reject({status: 400, msg: "Invalid topic query"})
   }
 
   const queryParams = [];
   let queryString = `SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.article_id)::int AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id`
 
-    if(topic && validTopics.includes(topic)){
+    if(topic){
       queryString += ` WHERE articles.topic = $1`;
       queryParams.push(topic);
     }
@@ -51,7 +51,7 @@ exports.selectArticles = (sort_by = 'created_at', order = 'desc', topic) => {
 
     return db.query(queryString, queryParams)
         .then(({ rows }) => {
-          return rows; // Return the fetched rows
+          return rows; 
         });
 })
 }
