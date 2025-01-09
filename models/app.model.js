@@ -34,6 +34,7 @@ exports.selectArticles = (sort_by = 'created_at', order = 'desc', topic) => {
   return db.query(validTopicsQuery)
     .then(({ rows }) => {
       const validTopics = rows.map(row => row.slug);
+      console.log(validTopics,"valid topics array")
    
       if(topic && !validTopics.includes(topic)){
     return Promise.reject({status: 400, msg: "Invalid topic query"})
